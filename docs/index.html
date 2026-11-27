@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>SmartSupport · Handbook de projet</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<aside class="sidebar" aria-label="Sommaire">
+  <a class="brand" href="#apercu"><span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 5h16v12h-8l-4 3v-3H4z"/><path d="M8 9h8m-8 4h5"/></svg></span><span><strong>SmartSupport</strong><small>Documentation de projet</small></span></a>
+  <button class="menu-button js-control" id="menu-toggle" type="button" aria-expanded="false" aria-controls="toc">Sommaire</button>
+  <nav id="toc" aria-label="Sections du handbook"><div class="nav-group"><p>Cadrage</p><a href="#apercu" aria-current="location">Vue d’ensemble</a><a href="#exigences">Périmètre et rôles</a><a href="#sitemap">Pages proposées</a><a href="#parcours">Parcours utilisateur</a><a href="#regles">Règles métier</a></div>
+<div class="nav-group"><p>Conception</p><a href="#donnees">Modèle de données</a><a href="#architecture">Architecture technique</a><a href="#securite">Sécurité</a><a href="#api">API REST</a></div>
+<div class="nav-group"><p>Pilotage</p><a href="#roadmap">Roadmap</a><a href="#backlog">Backlog</a><a href="#decisions">Décisions</a><a href="#methode">Méthode pédagogique</a></div></nav>
+</aside>
+<div class="page">
+  <header class="toolbar">
+    <form class="search-form js-control" role="search">
+      <label class="sr-only" for="search">Rechercher dans le handbook</label>
+      <input id="search" type="search" placeholder="Ticket, sprint, règle…" autocomplete="off" aria-controls="search-panel">
+      <button type="submit">Rechercher</button>
+    </form>
+    <div class="toolbar-actions js-control">
+      <button id="theme-toggle" type="button" aria-pressed="false">Mode sombre</button>
+      <button id="print" type="button">Imprimer</button>
+    </div>
+  </header>
+  <main id="contenu" tabindex="-1">
+    <div id="search-panel" class="search-panel" hidden>
+      <div class="section-heading"><h2>Résultats de recherche</h2><button type="button" id="search-close">Effacer</button></div>
+      <p id="search-count" role="status"></p><ul id="search-results"></ul>
+    </div>
+    <section id="apercu" aria-labelledby="h-apercu">
+      <div class="hero">
+        <p class="eyebrow">TechSolutions France · BTS SIO SLAM</p>
+        <h1 id="h-apercu">Handbook de projet</h1>
+        <p class="hero-lead">SmartSupport centralise les tickets clients et aide les techniciens à les trier et à y répondre avec une API LLM. Le technicien garde la décision sur le texte envoyé.</p>
+        <div class="hero-actions"><a class="primary" href="#roadmap">Voir la roadmap <span aria-hidden="true">↓</span></a><a class="secondary" href="#architecture">Consulter l’architecture <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <div class="overview-grid">
+        <article class="card"><p class="card-label">Sprint actuel</p><h2>S00 · Analyse</h2><span class="badge badge-info">IN PROGRESS</span></article>
+        <article class="card"><p class="card-label">Tâches du backlog</p><h2>1 / 31</h2><progress value="1" max="31" aria-label="1 tâche terminée sur 31">1 sur 31</progress><p class="small">Analyse initiale réalisée</p></article>
+        <article class="card"><p class="card-label">Développement</p><h2>Non commencé</h2><p class="small">S01 à S10 sont à faire.</p></article>
+      </div>
+      <div class="callout"><strong>État au 26 novembre 2026</strong><p>Les deux rôles, les corrections de cardinalités et la table CATEGORIE sont validés. L’étudiant a validé la stack principale. Les règles métier détaillées restent à définir et le MCD définitif à finaliser.</p><p>Les deux PDF du sujet sont absents de l’espace de travail. Les exigences ci-dessous proviennent du brief. Leur concordance avec le sujet officiel reste à vérifier.</p>
+      <div class="file-links"><a href="PROJECT_STATE.md">État du projet</a><a href="BACKLOG.md">Backlog Markdown</a><a href="DECISIONS.md">Journal des décisions</a></div></div>
+    </section>
+<section class="chapter" id="exigences" aria-labelledby="h-exigences">
+<h2 id="h-exigences">Périmètre et rôles</h2>
+
+<p>TechSolutions France est une entreprise fictive qui développe des logiciels de gestion pour les PME. Son équipe support reçoit de nombreuses demandes, les classe manuellement et rédige souvent des réponses similaires.</p>
+<div class="legend"><span class="badge badge-info">Exigence du brief</span> <span class="badge badge-proposal">Proposition</span> <span class="badge badge-ok">Décision validée</span> <span class="badge badge-warn">À confirmer</span></div>
+<div class="two-col">
+  <article class="card"><h3>CLIENT</h3><p>Créer un ticket, consulter ses propres tickets, suivre leur statut et lire les réponses envoyées.</p><p><span class="badge badge-proposal">Proposition</span> Échanger des messages si l’option est retenue.</p></article>
+  <article class="card"><h3>TECHNICIAN</h3><p>Consulter et filtrer les tickets par urgence, traiter les demandes, générer puis modifier une ébauche, valider et envoyer la réponse, et clôturer le ticket.</p></article>
+</div>
+<p><span class="badge badge-ok">Décision validée</span> L’application compte deux rôles. Le LLM est un service utilisé par le backend.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Fonctionnalités"><table><caption>Fonctionnalités</caption><thead><tr><th scope="col">Niveau</th><th scope="col">Périmètre</th></tr></thead><tbody>
+<tr><td><span class="badge badge-info">Exigence du brief</span></td><td>Créer un ticket avec titre, description et produit. Permettre au client de suivre son statut.</td></tr>
+<tr><td><span class="badge badge-info">Exigence du brief</span></td><td>Classer le ticket et estimer sa priorité automatiquement avec l’IA. Filtrer le tableau de bord technicien par urgence.</td></tr>
+<tr><td><span class="badge badge-info">Exigence du brief</span></td><td>Générer une ébauche. Permettre au technicien de la modifier, de la valider, d’envoyer la réponse puis de clôturer.</td></tr>
+<tr><td><span class="badge badge-proposal">Complément recommandé</span></td><td>Authentification et contrôle d’accès, historique des messages, attribution, recherche et filtres supplémentaires, statistiques, base de connaissances JSON/Markdown.</td></tr>
+<tr><td><span class="badge badge-proposal">Bonus</span></td><td>Protection renforcée contre les injections de prompt.</td></tr>
+</tbody></table></div>
+<p><strong>Catégories initiales</strong> · Bug, Demande d’information, Facturation.</p>
+<p><strong>Priorités</strong> · <code>FAIBLE</code>, <code>MOYEN</code>, <code>CRITIQUE</code>.</p>
+</section>
+<section class="chapter" id="sitemap" aria-labelledby="h-sitemap">
+<h2 id="h-sitemap">Pages proposées</h2>
+
+<p><span class="badge badge-proposal">Proposition</span> Les routes seront confirmées pendant S01, User Stories et User Flows.</p>
+<figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Sitemap proposé">
+    <svg viewBox="0 0 820 367" role="img" aria-labelledby="sitemap-svg-title sitemap-svg-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="sitemap-svg-title">Sitemap proposé</title>
+      <desc id="sitemap-svg-desc">Le point d’entrée public mène à l’espace client ou à l’espace technicien selon le rôle.</desc>
+<path class="svg-line" d="M410 67 V86 H213 V108 M410 86 H607 V108 M213 152 V176 H35 V334 M35 202 H62 M35 246 H62 M35 290 H62 M35 334 H62 M607 152 V176 H429 V290 M429 202 H456 M429 246 H456 M429 290 H456"/><rect class="svg-box" x="292" y="16" width="236" height="51" rx="12"/><text x="410" y="38.5" class="svg-label"><tspan x="410" dy="0">/login</tspan><tspan x="410" dy="21">Public</tspan></text><rect class="svg-box" x="63" y="108" width="300" height="44" rx="12"/><text x="213" y="135" class="svg-label"><tspan x="213" dy="0">Espace CLIENT</tspan></text><rect class="svg-box" x="457" y="108" width="300" height="44" rx="12"/><text x="607" y="135" class="svg-label"><tspan x="607" dy="0">Espace TECHNICIAN</tspan></text><rect class="svg-box" x="62" y="184" width="300" height="36" rx="12"/><text x="212" y="207" class="svg-label"><tspan x="212" dy="0">/client/dashboard</tspan></text><rect class="svg-box" x="62" y="228" width="300" height="36" rx="12"/><text x="212" y="251" class="svg-label"><tspan x="212" dy="0">/client/tickets</tspan></text><rect class="svg-box" x="62" y="272" width="300" height="36" rx="12"/><text x="212" y="295" class="svg-label"><tspan x="212" dy="0">/client/tickets/create</tspan></text><rect class="svg-box" x="62" y="316" width="300" height="36" rx="12"/><text x="212" y="339" class="svg-label"><tspan x="212" dy="0">/client/tickets/:id</tspan></text><rect class="svg-box" x="456" y="184" width="300" height="36" rx="12"/><text x="606" y="207" class="svg-label"><tspan x="606" dy="0">/technician/dashboard</tspan></text><rect class="svg-box" x="456" y="228" width="300" height="36" rx="12"/><text x="606" y="251" class="svg-label"><tspan x="606" dy="0">/technician/tickets</tspan></text><rect class="svg-box" x="456" y="272" width="300" height="36" rx="12"/><text x="606" y="295" class="svg-label"><tspan x="606" dy="0">/technician/tickets/:id</tspan></text>
+    </svg>
+  </div>
+</figure>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Objectif de chaque page"><table><caption>Objectif de chaque page</caption><thead><tr><th scope="col">Route</th><th scope="col">Objectif</th></tr></thead><tbody>
+<tr><td><code>/login</code></td><td>S’authentifier puis être redirigé selon son rôle.</td></tr>
+<tr><td><code>/client/dashboard</code></td><td>Voir les tickets récents et leur état.</td></tr>
+<tr><td><code>/client/tickets</code></td><td>Consulter la liste de ses tickets.</td></tr>
+<tr><td><code>/client/tickets/create</code></td><td>Soumettre un ticket pour un produit.</td></tr>
+<tr><td><code>/client/tickets/:id</code></td><td>Suivre un ticket et consulter les réponses envoyées.</td></tr>
+<tr><td><code>/technician/dashboard</code></td><td>Repérer les demandes urgentes et les tickets à traiter.</td></tr>
+<tr><td><code>/technician/tickets</code></td><td>Parcourir les tickets et appliquer les filtres.</td></tr>
+<tr><td><code>/technician/tickets/:id</code></td><td>Traiter un ticket, valider et envoyer une réponse, puis le clôturer.</td></tr>
+</tbody></table></div>
+</section>
+<section class="chapter" id="parcours" aria-labelledby="h-parcours">
+<h2 id="h-parcours">Parcours utilisateur</h2>
+
+<p><span class="badge badge-proposal">Proposition</span> Les diagrammes décrivent les enchaînements à valider en S01.</p>
+<details class="accordion" data-search-block><summary>Connexion et redirection</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Connexion et redirection">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow0-title flow0-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow0-title">Connexion et redirection</title>
+      <desc id="flow0-desc">Saisir les identifiants puis Vérifier et émettre le JWT puis Rediriger selon le rôle.</desc>
+<defs><marker id="flow0-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Saisir les</tspan><tspan x="122" dy="21">identifiants</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Vérifier et émettre</tspan><tspan x="375" dy="21">le JWT</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Rediriger selon</tspan><tspan x="628" dy="21">le rôle</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow0-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow0-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>CLIENT vers son tableau de bord. TECHNICIAN vers le sien. Si les identifiants échouent, rester sur la connexion et afficher un message générique.</p>
+</details>
+<details class="accordion" data-search-block><summary>Création d’un ticket</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Création d’un ticket">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow1-title flow1-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow1-title">Création d’un ticket</title>
+      <desc id="flow1-desc">Saisir titre, description, produit puis Valider et enregistrer le ticket puis Déclencher le tri par IA.</desc>
+<defs><marker id="flow1-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Saisir titre, description,</tspan><tspan x="122" dy="21">produit</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Valider et enregistrer</tspan><tspan x="375" dy="21">le ticket</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Déclencher le</tspan><tspan x="628" dy="21">tri par IA</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow1-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow1-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>Le serveur associe le ticket au client authentifié. En cas de saisie invalide, afficher les erreurs et conserver la saisie.</p>
+</details>
+<details class="accordion" data-search-block><summary>Classification automatique</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Classification automatique">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow2-title flow2-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow2-title">Classification automatique</title>
+      <desc id="flow2-desc">Préparer les données utiles puis Classer et estimer la priorité puis Contrôler puis enregistrer.</desc>
+<defs><marker id="flow2-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Préparer les données</tspan><tspan x="122" dy="21">utiles</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Classer et estimer</tspan><tspan x="375" dy="21">la priorité</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Contrôler puis</tspan><tspan x="628" dy="21">enregistrer</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow2-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow2-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>Le backend contrôle la catégorie et la priorité renvoyées par le modèle avant de les enregistrer.</p>
+</details>
+<details class="accordion" data-search-block><summary>Indisponibilité de l’IA</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Indisponibilité de l’IA">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow3-title flow3-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow3-title">Indisponibilité de l’IA</title>
+      <desc id="flow3-desc">Détecter erreur ou délai dépassé puis Conserver le ticket puis Signaler le tri manquant.</desc>
+<defs><marker id="flow3-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Détecter erreur ou</tspan><tspan x="122" dy="21">délai dépassé</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Conserver le</tspan><tspan x="375" dy="21">ticket</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Signaler le tri</tspan><tspan x="628" dy="21">manquant</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow3-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow3-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>La catégorie et la priorité peuvent rester vides. Le mode de reprise du tri reste à définir.</p>
+</details>
+<details class="accordion" data-search-block><summary>Consultation des tickets</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Consultation des tickets">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow4-title flow4-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow4-title">Consultation des tickets</title>
+      <desc id="flow4-desc">Ouvrir la liste puis Appliquer les droits et filtres puis Afficher le ticket autorisé.</desc>
+<defs><marker id="flow4-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Ouvrir la</tspan><tspan x="122" dy="21">liste</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Appliquer les droits</tspan><tspan x="375" dy="21">et filtres</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Afficher le ticket</tspan><tspan x="628" dy="21">autorisé</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow4-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow4-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>Le client ne voit que ses tickets. Le technicien peut filtrer par urgence et identifier les tickets dont la priorité est en attente.</p>
+</details>
+<details class="accordion" data-search-block><summary>Attribution d’un ticket</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Attribution d’un ticket">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow5-title flow5-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow5-title">Attribution d’un ticket</title>
+      <desc id="flow5-desc">Ouvrir un ticket puis Choisir un technicien puis Enregistrer l’attribution.</desc>
+<defs><marker id="flow5-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Ouvrir un</tspan><tspan x="122" dy="21">ticket</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Choisir un</tspan><tspan x="375" dy="21">technicien</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Enregistrer</tspan><tspan x="628" dy="21">l’attribution</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow5-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow5-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>Parcours conditionnel. Le responsable de l’attribution, les réaffectations et le traitement des conflits restent à définir.</p>
+</details>
+<details class="accordion" data-search-block><summary>Génération d’une réponse</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Génération d’une réponse">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow6-title flow6-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow6-title">Génération d’une réponse</title>
+      <desc id="flow6-desc">Demander une ébauche puis Interroger le LLM côté serveur puis Afficher le brouillon au technicien.</desc>
+<defs><marker id="flow6-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Demander une</tspan><tspan x="122" dy="21">ébauche</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Interroger le LLM</tspan><tspan x="375" dy="21">côté serveur</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Afficher le brouillon</tspan><tspan x="628" dy="21">au technicien</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow6-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow6-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>En cas d’indisponibilité, proposer une rédaction manuelle. La génération seule ne rend aucun contenu visible au client.</p>
+</details>
+<details class="accordion" data-search-block><summary>Validation humaine et envoi</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Validation humaine et envoi">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow7-title flow7-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow7-title">Validation humaine et envoi</title>
+      <desc id="flow7-desc">Relire et modifier l’ébauche puis Valider et déclencher l’envoi puis Rendre la réponse visible au client.</desc>
+<defs><marker id="flow7-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Relire et modifier</tspan><tspan x="122" dy="21">l’ébauche</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Valider et déclencher</tspan><tspan x="375" dy="21">l’envoi</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Rendre la réponse visible</tspan><tspan x="628" dy="21">au client</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow7-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow7-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>Le technicien choisit le texte final. Le canal et les modalités de notification restent à confirmer.</p>
+</details>
+<details class="accordion" data-search-block><summary>Clôture d’un ticket</summary>
+  <figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Clôture d’un ticket">
+    <svg viewBox="0 0 750 104" role="img" aria-labelledby="flow8-title flow8-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="flow8-title">Clôture d’un ticket</title>
+      <desc id="flow8-desc">Ouvrir le ticket à clôturer puis Contrôler la transition puis Enregistrer la clôture.</desc>
+<defs><marker id="flow8-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="10" y="18" width="224" height="68" rx="12"/><text x="122" y="49" class="svg-label"><tspan x="122" dy="0">Ouvrir le ticket</tspan><tspan x="122" dy="21">à clôturer</tspan></text><rect class="svg-box" x="263" y="18" width="224" height="68" rx="12"/><text x="375" y="49" class="svg-label"><tspan x="375" dy="0">Contrôler la</tspan><tspan x="375" dy="21">transition</tspan></text><rect class="svg-box" x="516" y="18" width="224" height="68" rx="12"/><text x="628" y="49" class="svg-label"><tspan x="628" dy="0">Enregistrer</tspan><tspan x="628" dy="21">la clôture</tspan></text><path class="svg-line" d="M234 52 H259" marker-end="url(#flow8-arrow)"/><path class="svg-line" d="M487 52 H512" marker-end="url(#flow8-arrow)"/>
+    </svg>
+  </div>
+</figure>
+  <p>Le technicien clôture le ticket. Les statuts de départ permis, la réouverture et les réponses après clôture restent à arbitrer.</p>
+</details>
+<div class="callout"><strong>Cycle de vie proposé</strong><p><code>OUVERT</code> → <code>EN_COURS</code> → <code>RESOLU</code> → <code>FERME</code></p><p>Les transitions précises sont à arbitrer avant leur implémentation.</p><button class="js-control" type="button" data-copy="OUVERT → EN_COURS → RESOLU → FERME">Copier le cycle de vie</button></div>
+</section>
+<section class="chapter" id="regles" aria-labelledby="h-regles">
+<h2 id="h-regles">Règles métier</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Catalogue des règles"><table><caption>Catalogue des règles</caption><thead><tr><th scope="col">ID</th><th scope="col">Niveau</th><th scope="col">Règle</th></tr></thead><tbody>
+<tr><td><code>RG-001</code></td><td><span class="badge badge-ok">Confirmé</span></td><td>Seuls les rôles CLIENT et TECHNICIAN sont disponibles.</td></tr>
+<tr><td><code>RG-002</code></td><td><span class="badge badge-info">Exigence du brief</span></td><td>Un client crée un ticket avec un titre, une description et un produit. Le serveur identifie le créateur.</td></tr>
+<tr><td><code>RG-003</code></td><td><span class="badge badge-info">Exigence du brief</span></td><td>Un client consulte uniquement ses tickets, leur statut et les réponses envoyées.</td></tr>
+<tr><td><code>RG-004</code></td><td><span class="badge badge-info">Exigence du brief</span></td><td>Le technicien consulte, filtre par urgence, traite, répond et clôture.</td></tr>
+<tr><td><code>RG-005</code></td><td><span class="badge badge-info">Exigence du brief</span></td><td>L’IA propose une catégorie et une priorité parmi les valeurs autorisées. Le backend contrôle le résultat.</td></tr>
+<tr><td><code>RG-006</code></td><td><span class="badge badge-ok">Confirmé</span></td><td>Un ticket peut être enregistré sans catégorie ni priorité si l’IA est indisponible.</td></tr>
+<tr><td><code>RG-007</code></td><td><span class="badge badge-ok">Confirmé</span></td><td>Le créateur est CLIENT. Un ticket peut être sans technicien assigné. Tout technicien assigné est TECHNICIAN.</td></tr>
+<tr><td><code>RG-008</code></td><td><span class="badge badge-info">Exigence du brief</span></td><td>Une ébauche IA doit être relue et validée par un technicien avant envoi.</td></tr>
+<tr><td><code>RG-009</code></td><td><span class="badge badge-ok">Confirmé</span></td><td>Chaque message a un auteur et appartient à un ticket. Un ticket peut contenir plusieurs messages.</td></tr>
+<tr><td><code>RG-010</code></td><td><span class="badge badge-proposal">Proposition</span></td><td>Le cycle nominal envisagé est OUVERT → EN_COURS → RESOLU → FERME.</td></tr>
+<tr><td><code>RG-011</code></td><td><span class="badge badge-warn">À arbitrer</span></td><td>Définir les transitions précises, la réouverture et les réponses après clôture.</td></tr>
+<tr><td><code>RG-012</code></td><td><span class="badge badge-warn">À arbitrer</span></td><td>Définir qui crée et gère les comptes et le référentiel des produits.</td></tr>
+<tr><td><code>RG-013</code></td><td><span class="badge badge-warn">À arbitrer</span></td><td>Valider l’attribution, la réaffectation et les droits associés.</td></tr>
+<tr><td><code>RG-014</code></td><td><span class="badge badge-warn">À arbitrer</span></td><td>Valider l’échange de messages par le client et les modalités de notification.</td></tr>
+<tr><td><code>RG-015</code></td><td><span class="badge badge-ok">Confirmé</span></td><td>Les catégories sont stockées dans une table dédiée et les mots de passe sont hachés.</td></tr>
+</tbody></table></div>
+</section>
+<section class="chapter" id="donnees" aria-labelledby="h-donnees">
+<h2 id="h-donnees">Modèle de données</h2>
+
+<p><span class="badge badge-warn">À finaliser</span> MCD de travail avec cardinalités acceptées. Les identifiants sont soulignés dans les entités. Les associations figurent dans les ovales.</p>
+<figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="MCD Merise de SmartSupport">
+    <svg viewBox="0 0 960 586" role="img" aria-labelledby="merise-title merise-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="merise-title">MCD Merise de SmartSupport</title>
+      <desc id="merise-desc">Cinq entités reliées par six associations munies de cardinalités. Un tableau équivalent suit le diagramme.</desc>
+<path class="svg-line" d="M217 82 H286 M398 82 H440 M217 150 H286 M398 150 H440"/><path class="svg-line" d="M622 86 H650 M762 86 H784 M622 182 H650 M762 182 H784"/><path class="svg-line" d="M527 239 V300 M527 342 V445"/><path class="svg-line" d="M113 233 V381 H274 M386 381 H409 V489 H440"/><g><rect class="svg-box" x="14" y="34" width="203" height="199" rx="9"/><path class="svg-line" d="M14 67h203"/><text x="115.5" y="57" class="svg-label"><tspan x="115.5" dy="0">UTILISATEUR</tspan></text><text class="svg-field svg-key" x="28" y="87">id_utilisateur</text><text class="svg-field" x="28" y="110">nom</text><text class="svg-field" x="28" y="133">prenom</text><text class="svg-field" x="28" y="156">email</text><text class="svg-field" x="28" y="179">password_hash</text><text class="svg-field" x="28" y="202">role (CLIENT / TECHNICIAN)</text><text class="svg-field" x="28" y="225">nom_entreprise (facultatif)</text></g><g><rect class="svg-box" x="440" y="40" width="182" height="199" rx="9"/><path class="svg-line" d="M440 73h182"/><text x="531" y="63" class="svg-label"><tspan x="531" dy="0">TICKET</tspan></text><text class="svg-field svg-key" x="454" y="93">id_ticket</text><text class="svg-field" x="454" y="116">titre</text><text class="svg-field" x="454" y="139">description</text><text class="svg-field" x="454" y="162">statut</text><text class="svg-field" x="454" y="185">priorite</text><text class="svg-field" x="454" y="208">date_creation</text><text class="svg-field" x="454" y="231">date_cloture</text></g><g><rect class="svg-box" x="784" y="12" width="162" height="130" rx="9"/><path class="svg-line" d="M784 45h162"/><text x="865" y="35" class="svg-label"><tspan x="865" dy="0">PRODUIT</tspan></text><text class="svg-field svg-key" x="798" y="65">id_produit</text><text class="svg-field" x="798" y="88">nom</text><text class="svg-field" x="798" y="111">description</text><text class="svg-field" x="798" y="134">version</text></g><g><rect class="svg-box" x="784" y="157" width="162" height="84" rx="9"/><path class="svg-line" d="M784 190h162"/><text x="865" y="180" class="svg-label"><tspan x="865" dy="0">CATEGORIE</tspan></text><text class="svg-field svg-key" x="798" y="210">id_categorie</text><text class="svg-field" x="798" y="233">libelle</text></g><g><rect class="svg-box" x="440" y="445" width="182" height="130" rx="9"/><path class="svg-line" d="M440 478h182"/><text x="531" y="468" class="svg-label"><tspan x="531" dy="0">MESSAGE</tspan></text><text class="svg-field svg-key" x="454" y="498">id_message</text><text class="svg-field" x="454" y="521">contenu</text><text class="svg-field" x="454" y="544">date_creation</text><text class="svg-field" x="454" y="567">date_envoi</text></g><ellipse class="svg-assoc" cx="342" cy="82" rx="56" ry="21"/><text x="342" y="87" class="svg-label"><tspan x="342" dy="0">Créer</tspan></text><ellipse class="svg-assoc" cx="342" cy="150" rx="56" ry="21"/><text x="342" y="155" class="svg-label"><tspan x="342" dy="0">Traiter</tspan></text><ellipse class="svg-assoc" cx="706" cy="86" rx="56" ry="21"/><text x="706" y="91" class="svg-label"><tspan x="706" dy="0">Concerner</tspan></text><ellipse class="svg-assoc" cx="706" cy="182" rx="56" ry="21"/><text x="706" y="187" class="svg-label"><tspan x="706" dy="0">Classifier</tspan></text><ellipse class="svg-assoc" cx="527" cy="321" rx="56" ry="21"/><text x="527" y="326" class="svg-label"><tspan x="527" dy="0">Contenir</tspan></text><ellipse class="svg-assoc" cx="330" cy="381" rx="56" ry="21"/><text x="330" y="386" class="svg-label"><tspan x="330" dy="0">Écrire</tspan></text><text x="242" y="74" class="svg-cardinality"><tspan x="242" dy="0">0,N</tspan></text><text x="418" y="74" class="svg-cardinality"><tspan x="418" dy="0">1,1</tspan></text><text x="242" y="142" class="svg-cardinality"><tspan x="242" dy="0">0,N</tspan></text><text x="418" y="142" class="svg-cardinality"><tspan x="418" dy="0">0,1</tspan></text><text x="635" y="71" class="svg-cardinality"><tspan x="635" dy="0">1,1</tspan></text><text x="773" y="71" class="svg-cardinality"><tspan x="773" dy="0">0,N</tspan></text><text x="635" y="167" class="svg-cardinality"><tspan x="635" dy="0">0,1</tspan></text><text x="773" y="167" class="svg-cardinality"><tspan x="773" dy="0">0,N</tspan></text><text x="550" y="263" class="svg-cardinality"><tspan x="550" dy="0">0,N</tspan></text><text x="550" y="433" class="svg-cardinality"><tspan x="550" dy="0">1,1</tspan></text><text x="138" y="252" class="svg-cardinality"><tspan x="138" dy="0">0,N</tspan></text><text x="421" y="479" class="svg-cardinality"><tspan x="421" dy="0">1,1</tspan></text>
+    </svg>
+  </div>
+</figure>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Associations Merise"><table><caption>Associations Merise</caption><thead><tr><th scope="col">Entité et cardinalité</th><th scope="col">Association</th><th scope="col">Entité et cardinalité</th></tr></thead><tbody>
+<tr><td>UTILISATEUR (0,N)</td><td>Créer</td><td>TICKET (1,1)</td></tr>
+<tr><td>UTILISATEUR (0,N)</td><td>Traiter</td><td>TICKET (0,1)</td></tr>
+<tr><td>PRODUIT (0,N)</td><td>Concerner</td><td>TICKET (1,1)</td></tr>
+<tr><td>CATEGORIE (0,N)</td><td>Classifier</td><td>TICKET (0,1)</td></tr>
+<tr><td>TICKET (0,N)</td><td>Contenir</td><td>MESSAGE (1,1)</td></tr>
+<tr><td>UTILISATEUR (0,N)</td><td>Écrire</td><td>MESSAGE (1,1)</td></tr>
+</tbody></table></div>
+<div class="three-col">
+  <article class="card"><h3>MCD</h3><p>Modèle conceptuel des entités métier, de leurs attributs et de leurs associations avec cardinalités.</p></article>
+  <article class="card"><h3>MLD</h3><p>Modèle logique qui traduit les associations en relations, clés primaires et clés étrangères.</p></article>
+  <article class="card"><h3>MPD</h3><p>Modèle physique PostgreSQL. Types, contraintes, index et scripts SQL seront définis par l’étudiant en S02.</p></article>
+</div>
+<h3>MLD préliminaire</h3>
+<p>PK désigne la clé primaire. FK désigne une clé étrangère. Un champ nullable peut être absent.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Relations et références"><table><caption>Relations et références</caption><thead><tr><th scope="col">Relation</th><th scope="col">PK</th><th scope="col">Autres attributs</th><th scope="col">FK et règles de nullabilité</th></tr></thead><tbody>
+<tr><td>UTILISATEUR</td><td>id_utilisateur</td><td>nom, prenom, email, password_hash, role, nom_entreprise</td><td>Rôle CLIENT ou TECHNICIAN. nom_entreprise facultatif, à confirmer.</td></tr>
+<tr><td>PRODUIT</td><td>id_produit</td><td>nom, description, version</td><td>—</td></tr>
+<tr><td>CATEGORIE</td><td>id_categorie</td><td>libelle</td><td>—</td></tr>
+<tr><td>TICKET</td><td>id_ticket</td><td>titre, description, statut, priorite, date_creation, date_cloture</td><td>id_client → UTILISATEUR (obligatoire, CLIENT). id_technicien → UTILISATEUR (nullable, TECHNICIAN). id_produit → PRODUIT (obligatoire). id_categorie → CATEGORIE (nullable). priorite nullable en attente du tri, date_cloture renseignée à la clôture.</td></tr>
+<tr><td>MESSAGE</td><td>id_message</td><td>contenu, date_creation, date_envoi</td><td>id_ticket → TICKET et id_auteur → UTILISATEUR (obligatoires).</td></tr>
+</tbody></table></div>
+<p>Le contrôle des rôles associés aux références sera précisé en S02 et appliqué côté serveur.</p>
+</section>
+<section class="chapter" id="architecture" aria-labelledby="h-architecture">
+<h2 id="h-architecture">Architecture technique</h2>
+
+<p><span class="badge badge-ok">Validée par l’étudiant</span> React s’appuie sur TanStack Query. L’API REST repose sur Node.js, Fastify et une architecture MVC adaptée aux API. PostgreSQL stocke les données. Le service IA est accessible uniquement depuis le backend.</p>
+<figure class="diagram">
+  <div class="diagram-scroll" tabindex="0" role="region" aria-label="Architecture technique">
+    <svg viewBox="0 0 820 235" role="img" aria-labelledby="architecture-svg-title architecture-svg-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="architecture-svg-title">Architecture technique</title>
+      <desc id="architecture-svg-desc">React appelle l’API Fastify. Fastify communique avec PostgreSQL et avec le service IA.</desc>
+<defs><marker id="architecture-svg-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="svg-arrow" d="M0 0 L8 4 L0 8 Z"/></marker></defs><rect class="svg-box" x="22" y="32" width="210" height="62" rx="12"/><text x="127" y="60" class="svg-label"><tspan x="127" dy="0">React</tspan><tspan x="127" dy="21">TanStack Query</tspan></text><rect class="svg-box" x="305" y="32" width="210" height="62" rx="12"/><text x="410" y="60" class="svg-label"><tspan x="410" dy="0">Node.js · Fastify</tspan><tspan x="410" dy="21">API REST</tspan></text><rect class="svg-box" x="588" y="32" width="210" height="62" rx="12"/><text x="693" y="60" class="svg-label"><tspan x="693" dy="0">PostgreSQL</tspan><tspan x="693" dy="21">Données métier</tspan></text><rect class="svg-box" x="305" y="153" width="210" height="62" rx="12"/><text x="410" y="181" class="svg-label"><tspan x="410" dy="0">Service IA</tspan><tspan x="410" dy="21">LLM externe ou local</tspan></text><path class="svg-line" d="M232 63 H303" marker-end="url(#architecture-svg-arrow)"/><path class="svg-line" d="M515 63 H586" marker-end="url(#architecture-svg-arrow)"/><path class="svg-line" d="M410 94 V150" marker-end="url(#architecture-svg-arrow)"/>
+    </svg>
+  </div>
+</figure>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Responsabilité des couches"><table><caption>Responsabilité des couches</caption><thead><tr><th scope="col">Couche</th><th scope="col">Responsabilité</th></tr></thead><tbody>
+<tr><td>Routes</td><td>Déclarer les chemins, méthodes, schémas et hooks associés.</td></tr>
+<tr><td>Middlewares / hooks</td><td>Authentifier, vérifier les rôles et appliquer les contrôles transverses.</td></tr>
+<tr><td>Controllers</td><td>Lire les entrées validées, appeler le service et produire la réponse HTTP.</td></tr>
+<tr><td>Services</td><td>Appliquer les règles métier, vérifier les droits sur les ressources et orchestrer données et IA.</td></tr>
+<tr><td>Repositories / models</td><td>Encapsuler les requêtes paramétrées et la conversion des données PostgreSQL.</td></tr>
+</tbody></table></div>
+<p><strong>Validation et sécurité</strong> · Zod, JWT, RBAC à deux rôles, hachage des mots de passe et requêtes SQL paramétrées.</p>
+<p><strong>Outillage</strong> · Git, GitHub et Postman. <strong>Exclusions du brief</strong> · Express et Docker.</p>
+<p><span class="badge badge-warn">À confirmer</span> JavaScript ou TypeScript, routage, CSS, fournisseur LLM, stockage et renouvellement JWT, driver SQL ou ORM, hébergement et acceptation de Fastify par le professeur.</p>
+</section>
+<section class="chapter" id="securite" aria-labelledby="h-securite">
+<h2 id="h-securite">Sécurité</h2>
+
+<p>Mesures à mettre en œuvre et à vérifier pendant les sprints concernés.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Contrôles de sécurité"><table><caption>Contrôles de sécurité</caption><thead><tr><th scope="col">Domaine</th><th scope="col">Mesure</th></tr></thead><tbody>
+<tr><td>Secrets</td><td>Injecter les secrets et clés IA dans les variables d’environnement du backend. Exclure de Git les fichiers contenant des secrets et renseigner seulement des valeurs factices dans le fichier d’exemple. Révoquer toute clé exposée.</td></tr>
+<tr><td>Mots de passe</td><td>Stocker un hachage sécurisé avec sel via une bibliothèque éprouvée. Exclure les mots de passe et hachages des réponses et des journaux.</td></tr>
+<tr><td>Validation</td><td>Valider côté serveur avec Zod les corps, paramètres de route et filtres. Encadrer formats, longueurs et valeurs permises.</td></tr>
+<tr><td>Authentification</td><td>Vérifier signature, expiration et claims nécessaires du JWT. Arrêter la stratégie de stockage, d’expiration et de renouvellement en S03.</td></tr>
+<tr><td>Autorisations</td><td>Contrôler le rôle puis la propriété sur les opérations concernées. Vérifier les accès à chaque ressource, y compris les messages.</td></tr>
+<tr><td>SQL</td><td>Utiliser des paramètres pour les valeurs et une liste fermée de colonnes pour les tris.</td></tr>
+<tr><td>Confidentialité IA</td><td>Limiter les données envoyées et filtrer les données personnelles avant tout transfert externe. Éviter leur présence dans les journaux et messages d’erreur.</td></tr>
+<tr><td>Disponibilité IA</td><td>Définir des délais maximum, gérer erreurs et quotas, conserver le ticket si le tri échoue et permettre une réponse manuelle.</td></tr>
+<tr><td>Validation humaine</td><td>Garder l’ébauche hors de la vue client jusqu’à la validation et à l’envoi explicites par un technicien.</td></tr>
+<tr><td>Injections de prompt</td><td>Traiter les tickets et la base de connaissances comme des données non fiables. Isoler les instructions, contrôler la sortie et limiter les capacités du modèle. Évaluer les protections renforcées en bonus.</td></tr>
+</tbody></table></div>
+</section>
+<section class="chapter" id="api" aria-labelledby="h-api">
+<h2 id="h-api">API REST</h2>
+
+<p><span class="badge badge-proposal">Proposition</span> Contrats préliminaires à valider en S03. Réponses JSON envisagées sous les formes <code>{ data }</code>, <code>{ data, meta }</code> pour une liste paginée, ou <code>{ error: { code, message } }</code>.</p>
+<p>Codes proposés · 200 lecture ou modification, 201 création, 400 saisie invalide, 401 authentification requise ou invalide, 403 rôle interdit, 404 ressource absente ou hors périmètre, 409 conflit métier, 429 limite atteinte, 503 IA indisponible, 504 délai IA dépassé.</p>
+<p>Le tri IA intervient en interne après la création du ticket. Les écritures de produits ou de comptes dépendront des règles à valider. L’envoi d’une réponse intervient après la validation humaine.</p>
+<details class="accordion" data-search-block open><summary>Authentication</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Endpoints · Authentication"><table><caption>Endpoints · Authentication</caption><thead><tr><th scope="col">Méthode</th><th scope="col">Endpoint</th><th scope="col">Permissions</th><th scope="col">Réponse en cas de succès</th><th scope="col">Codes HTTP</th></tr></thead><tbody>
+<tr><td><span class="badge badge-neutral">POST</span></td><td><code>/api/auth/login</code></td><td>Public</td><td>Objet avec jeton d’accès et profil minimal</td><td>200, 400, 401, 429</td></tr>
+</tbody></table></div>
+</details>
+<details class="accordion" data-search-block><summary>Users</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Endpoints · Users"><table><caption>Endpoints · Users</caption><thead><tr><th scope="col">Méthode</th><th scope="col">Endpoint</th><th scope="col">Permissions</th><th scope="col">Réponse en cas de succès</th><th scope="col">Codes HTTP</th></tr></thead><tbody>
+<tr><td><span class="badge badge-neutral">GET</span></td><td><code>/api/users/me</code></td><td>Les deux rôles</td><td>Profil de l’utilisateur courant</td><td>200, 401</td></tr>
+<tr><td><span class="badge badge-neutral">GET</span></td><td><code>/api/users?role=TECHNICIAN</code></td><td>TECHNICIAN, si attribution retenue</td><td>Liste de profils minimaux</td><td>200, 400, 401, 403</td></tr>
+</tbody></table></div>
+</details>
+<details class="accordion" data-search-block><summary>Products</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Endpoints · Products"><table><caption>Endpoints · Products</caption><thead><tr><th scope="col">Méthode</th><th scope="col">Endpoint</th><th scope="col">Permissions</th><th scope="col">Réponse en cas de succès</th><th scope="col">Codes HTTP</th></tr></thead><tbody>
+<tr><td><span class="badge badge-neutral">GET</span></td><td><code>/api/products</code></td><td>Les deux rôles</td><td>Liste des produits</td><td>200, 401</td></tr>
+<tr><td><span class="badge badge-neutral">GET</span></td><td><code>/api/products/:id</code></td><td>Les deux rôles</td><td>Produit</td><td>200, 401, 404</td></tr>
+</tbody></table></div>
+</details>
+<details class="accordion" data-search-block><summary>Tickets</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Endpoints · Tickets"><table><caption>Endpoints · Tickets</caption><thead><tr><th scope="col">Méthode</th><th scope="col">Endpoint</th><th scope="col">Permissions</th><th scope="col">Réponse en cas de succès</th><th scope="col">Codes HTTP</th></tr></thead><tbody>
+<tr><td><span class="badge badge-neutral">POST</span></td><td><code>/api/tickets</code></td><td>CLIENT</td><td>Ticket créé, priorité et catégorie éventuellement nulles</td><td>201, 400, 401, 403, 404</td></tr>
+<tr><td><span class="badge badge-neutral">GET</span></td><td><code>/api/tickets</code></td><td>CLIENT (les siens), TECHNICIAN (filtres d’urgence)</td><td>Liste paginée de tickets</td><td>200, 400, 401</td></tr>
+<tr><td><span class="badge badge-neutral">GET</span></td><td><code>/api/tickets/:id</code></td><td>CLIENT propriétaire ou TECHNICIAN</td><td>Détail du ticket</td><td>200, 401, 404</td></tr>
+<tr><td><span class="badge badge-neutral">PATCH</span></td><td><code>/api/tickets/:id/assignment</code></td><td>TECHNICIAN, si option retenue</td><td>Ticket avec attribution actualisée</td><td>200, 400, 401, 403, 404, 409</td></tr>
+<tr><td><span class="badge badge-neutral">PATCH</span></td><td><code>/api/tickets/:id/status</code></td><td>TECHNICIAN</td><td>Ticket avec statut actualisé, y compris clôture</td><td>200, 400, 401, 403, 404, 409</td></tr>
+</tbody></table></div>
+</details>
+<details class="accordion" data-search-block><summary>Categories</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Endpoints · Categories"><table><caption>Endpoints · Categories</caption><thead><tr><th scope="col">Méthode</th><th scope="col">Endpoint</th><th scope="col">Permissions</th><th scope="col">Réponse en cas de succès</th><th scope="col">Codes HTTP</th></tr></thead><tbody>
+<tr><td><span class="badge badge-neutral">GET</span></td><td><code>/api/categories</code></td><td>TECHNICIAN</td><td>Liste des catégories</td><td>200, 401, 403</td></tr>
+</tbody></table></div>
+</details>
+<details class="accordion" data-search-block><summary>Messages</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Endpoints · Messages"><table><caption>Endpoints · Messages</caption><thead><tr><th scope="col">Méthode</th><th scope="col">Endpoint</th><th scope="col">Permissions</th><th scope="col">Réponse en cas de succès</th><th scope="col">Codes HTTP</th></tr></thead><tbody>
+<tr><td><span class="badge badge-neutral">GET</span></td><td><code>/api/tickets/:id/messages</code></td><td>CLIENT propriétaire (messages envoyés) ou TECHNICIAN</td><td>Liste de messages visibles</td><td>200, 401, 404</td></tr>
+<tr><td><span class="badge badge-neutral">POST</span></td><td><code>/api/tickets/:id/messages</code></td><td>TECHNICIAN après validation humaine. CLIENT propriétaire si option retenue</td><td>Message envoyé</td><td>201, 400, 401, 403, 404, 409</td></tr>
+</tbody></table></div>
+</details>
+<details class="accordion" data-search-block><summary>AI</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Endpoints · AI"><table><caption>Endpoints · AI</caption><thead><tr><th scope="col">Méthode</th><th scope="col">Endpoint</th><th scope="col">Permissions</th><th scope="col">Réponse en cas de succès</th><th scope="col">Codes HTTP</th></tr></thead><tbody>
+<tr><td><span class="badge badge-neutral">POST</span></td><td><code>/api/tickets/:id/ai/draft</code></td><td>TECHNICIAN</td><td>Ébauche de réponse, sans publication</td><td>200, 400, 401, 403, 404, 429, 503, 504</td></tr>
+</tbody></table></div>
+</details>
+</section>
+<section class="chapter" id="roadmap" aria-labelledby="h-roadmap">
+<h2 id="h-roadmap">Roadmap</h2>
+
+<p>Les dépendances structurent l’ordre du travail. Le suivi reflète l’état initial communiqué et le backlog proposé.</p>
+<ol class="roadmap">
+<li id="sprint-S00">
+  <details class="accordion" data-search-block open>
+    <summary><span class="sprint-id">S00</span> <span class="sprint-name">Analyse des besoins et cahier des charges</span> <span class="badge badge-info">IN PROGRESS</span></summary>
+    <p>Cadrer le problème, les acteurs et le périmètre.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Brief du projet.</dd><dt>Livrables</dt><dd>Cahier des charges et décisions de périmètre.</dd><dt>Critères d’acceptation</dt><dd>Exigences traçables, écarts avec le sujet officiel recensés et points ouverts identifiés.</dd><dt>Dépendances</dt><dd>Aucune</dd></dl>
+    <div class="sprint-progress"><progress value="1" max="3" aria-label="S00 · 1 tâche(s) terminée(s) sur 3"></progress><span>1 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S00">Voir les tâches du sprint S00</a>
+  </details>
+</li>
+<li id="sprint-S01">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S01</span> <span class="sprint-name">User Stories et User Flows</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Formaliser les parcours et les règles métier.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Cadrage S00.</dd><dt>Livrables</dt><dd>User stories, parcours et catalogue métier.</dd><dt>Critères d’acceptation</dt><dd>Les deux rôles, les cas d’échec et les règles ouvertes sont couverts.</dd><dt>Dépendances</dt><dd>S00</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="3" aria-label="S01 · 0 tâche(s) terminée(s) sur 3"></progress><span>0 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S01">Voir les tâches du sprint S01</a>
+  </details>
+</li>
+<li id="sprint-S02">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S02</span> <span class="sprint-name">Database Design</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Finaliser les modèles et préparer les requêtes.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Règles métier S01.</dd><dt>Livrables</dt><dd>MCD, MLD, MPD, SQL et requêtes de vérification.</dd><dt>Critères d’acceptation</dt><dd>Cardinalités, clés et contraintes de rôle cohérentes, avec cas de champs facultatifs vérifiés.</dd><dt>Dépendances</dt><dd>S01</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="3" aria-label="S02 · 0 tâche(s) terminée(s) sur 3"></progress><span>0 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S02">Voir les tâches du sprint S02</a>
+  </details>
+</li>
+<li id="sprint-S03">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S03</span> <span class="sprint-name">API Design et architecture technique</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Fixer les contrats et la séparation des couches.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Parcours et modèle logique stabilisés.</dd><dt>Livrables</dt><dd>Contrat REST, architecture et exemples Postman.</dd><dt>Critères d’acceptation</dt><dd>Chaque route décrit ses entrées, sorties, erreurs et droits.</dd><dt>Dépendances</dt><dd>S01, S02</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="3" aria-label="S03 · 0 tâche(s) terminée(s) sur 3"></progress><span>0 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S03">Voir les tâches du sprint S03</a>
+  </details>
+</li>
+<li id="sprint-S04">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S04</span> <span class="sprint-name">Backend – Authentification et autorisations</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Protéger l’identité et les accès.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Contrats API et méthode JWT arbitrée.</dd><dt>Livrables</dt><dd>Authentification, contrôles de rôle et de propriété.</dd><dt>Critères d’acceptation</dt><dd>Les accès croisés et les jetons invalides sont refusés.</dd><dt>Dépendances</dt><dd>S02, S03</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="3" aria-label="S04 · 0 tâche(s) terminée(s) sur 3"></progress><span>0 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S04">Voir les tâches du sprint S04</a>
+  </details>
+</li>
+<li id="sprint-S05">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S05</span> <span class="sprint-name">Backend – Fonctionnalités métier</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Mettre en œuvre le traitement des tickets.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Modèle physique et accès disponibles.</dd><dt>Livrables</dt><dd>API métier tickets, produits, catégories et réponses.</dd><dt>Critères d’acceptation</dt><dd>Création, consultation, réponse et clôture suivent les règles validées.</dd><dt>Dépendances</dt><dd>S02, S03, S04</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="3" aria-label="S05 · 0 tâche(s) terminée(s) sur 3"></progress><span>0 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S05">Voir les tâches du sprint S05</a>
+  </details>
+</li>
+<li id="sprint-S06">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S06</span> <span class="sprint-name">Intégration de l’intelligence artificielle</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Assister le tri et la rédaction.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>API métier et fournisseur LLM choisi.</dd><dt>Livrables</dt><dd>Classification, priorité, brouillons et gestion des indisponibilités.</dd><dt>Critères d’acceptation</dt><dd>Une panne préserve le ticket et chaque envoi requiert une validation humaine.</dd><dt>Dépendances</dt><dd>S03, S05</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="3" aria-label="S06 · 0 tâche(s) terminée(s) sur 3"></progress><span>0 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S06">Voir les tâches du sprint S06</a>
+  </details>
+</li>
+<li id="sprint-S07">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S07</span> <span class="sprint-name">UI/UX Design</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Concevoir les interfaces des deux rôles.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>User flows confirmés.</dd><dt>Livrables</dt><dd>Maquettes et états d’interface.</dd><dt>Critères d’acceptation</dt><dd>Les parcours principaux et les états vide, chargement et erreur sont couverts.</dd><dt>Dépendances</dt><dd>S01</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="2" aria-label="S07 · 0 tâche(s) terminée(s) sur 2"></progress><span>0 / 2</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S07">Voir les tâches du sprint S07</a>
+  </details>
+</li>
+<li id="sprint-S08">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S08</span> <span class="sprint-name">Frontend Development</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Intégrer les parcours à l’API.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Maquettes et contrats exploitables.</dd><dt>Livrables</dt><dd>Interfaces React et intégration TanStack Query.</dd><dt>Critères d’acceptation</dt><dd>Les parcours convenus fonctionnent avec les états de chargement et d’erreur.</dd><dt>Dépendances</dt><dd>S04, S05, S06, S07</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="3" aria-label="S08 · 0 tâche(s) terminée(s) sur 3"></progress><span>0 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S08">Voir les tâches du sprint S08</a>
+  </details>
+</li>
+<li id="sprint-S09">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S09</span> <span class="sprint-name">Tests et cybersécurité</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Vérifier la conformité fonctionnelle et la sécurité.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Parcours intégrés et environnement de test.</dd><dt>Livrables</dt><dd>Plan de tests et résultats documentés.</dd><dt>Critères d’acceptation</dt><dd>Les écarts sont reproductibles et les corrections prioritaires sont revérifiées.</dd><dt>Dépendances</dt><dd>S06, S08</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="3" aria-label="S09 · 0 tâche(s) terminée(s) sur 3"></progress><span>0 / 3</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S09">Voir les tâches du sprint S09</a>
+  </details>
+</li>
+<li id="sprint-S10">
+  <details class="accordion" data-search-block>
+    <summary><span class="sprint-id">S10</span> <span class="sprint-name">Déploiement et documentation</span> <span class="badge badge-neutral">TODO</span></summary>
+    <p>Préparer la livraison et la démonstration.</p>
+    <dl class="sprint-meta"><dt>Prérequis</dt><dd>Tests exécutés et hébergement choisi.</dd><dt>Livrables</dt><dd>Livraison, guide de mise en service et dossier pédagogique.</dd><dt>Critères d’acceptation</dt><dd>La mise en service est reproductible et la démonstration couvre les parcours demandés.</dd><dt>Dépendances</dt><dd>S09</dd></dl>
+    <div class="sprint-progress"><progress value="0" max="2" aria-label="S10 · 0 tâche(s) terminée(s) sur 2"></progress><span>0 / 2</span></div>
+    <a class="backlog-link" href="#backlog" data-filter-sprint="S10">Voir les tâches du sprint S10</a>
+  </details>
+</li>
+</ol>
+</section>
+<section class="chapter" id="backlog" aria-labelledby="h-backlog">
+<h2 id="h-backlog">Backlog</h2>
+
+<p>Les priorités sont proposées. La colonne GitHub Issue pourra accueillir un lien par tâche.</p>
+<div class="filters js-control" aria-label="Filtres du backlog">
+  <label>Sprint<select id="filter-sprint"><option value="">Tous</option><option>S00</option><option>S01</option><option>S02</option><option>S03</option><option>S04</option><option>S05</option><option>S06</option><option>S07</option><option>S08</option><option>S09</option><option>S10</option></select></label>
+  <label>Priorité<select id="filter-priority"><option value="">Toutes</option><option>Haute</option><option>Normale</option><option>Basse</option></select></label>
+  <label>Statut<select id="filter-status"><option value="">Tous</option><option value="TODO">À faire · TODO</option><option value="IN PROGRESS">En cours · IN PROGRESS</option><option value="IN REVIEW">En revue · IN REVIEW</option><option value="BLOCKED">Bloqué · BLOCKED</option><option value="DONE">Terminé · DONE</option></select></label>
+  <button id="reset-filters" type="button">Réinitialiser les filtres</button>
+</div>
+<p id="backlog-count" role="status">31 tâches affichées.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Tâches du backlog">
+  <table><caption>Tâches du backlog</caption><thead><tr><th scope="col">ID</th><th scope="col">Tâche</th><th scope="col">Priorité</th><th scope="col">Statut</th><th scope="col">Note</th><th scope="col">GitHub Issue</th></tr></thead>
+  <tbody>
+<tr data-sprint="S00" data-priority="Haute" data-status="DONE" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S00-T01" aria-label="Copier S00-T01" title="Copier l’identifiant">S00-T01</button></th><td>Réaliser l’analyse initiale</td><td>Haute</td><td><span class="badge badge-ok">DONE</span></td><td>Contexte et besoins initiaux identifiés dans le brief.</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S00" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S00-T02" aria-label="Copier S00-T02" title="Copier l’identifiant">S00-T02</button></th><td>Consolider le cahier des charges</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>Vérifier les exigences sur les PDF lorsqu’ils seront disponibles.</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S00" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S00-T03" aria-label="Copier S00-T03" title="Copier l’identifiant">S00-T03</button></th><td>Consigner les validations de cadrage</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>Tracer les choix de rôles, de stack et de modélisation confirmés dans le brief.</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S01" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S01-T01" aria-label="Copier S01-T01" title="Copier l’identifiant">S01-T01</button></th><td>Rédiger les user stories et leurs critères</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S01" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S01-T02" aria-label="Copier S01-T02" title="Copier l’identifiant">S01-T02</button></th><td>Valider les parcours et les routes</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S01" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S01-T03" aria-label="Copier S01-T03" title="Copier l’identifiant">S01-T03</button></th><td>Arbitrer les transitions, l’attribution et la gestion des comptes</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S02" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S02-T01" aria-label="Copier S02-T01" title="Copier l’identifiant">S02-T01</button></th><td>Finaliser le MCD et le MLD</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S02" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S02-T02" aria-label="Copier S02-T02" title="Copier l’identifiant">S02-T02</button></th><td>Concevoir le MPD et écrire le SQL</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S02" data-priority="Normale" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S02-T03" aria-label="Copier S02-T03" title="Copier l’identifiant">S02-T03</button></th><td>Préparer les requêtes et vérifier les contraintes</td><td>Normale</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S03" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S03-T01" aria-label="Copier S03-T01" title="Copier l’identifiant">S03-T01</button></th><td>Définir contrats, erreurs, pagination et permissions</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S03" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S03-T02" aria-label="Copier S03-T02" title="Copier l’identifiant">S03-T02</button></th><td>Valider les couches et arbitrer les choix techniques</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S03" data-priority="Normale" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S03-T03" aria-label="Copier S03-T03" title="Copier l’identifiant">S03-T03</button></th><td>Préparer la collection Postman</td><td>Normale</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S04" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S04-T01" aria-label="Copier S04-T01" title="Copier l’identifiant">S04-T01</button></th><td>Mettre en place le hachage et la connexion</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S04" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S04-T02" aria-label="Copier S04-T02" title="Copier l’identifiant">S04-T02</button></th><td>Mettre en place JWT, RBAC et contrôle de propriété</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S04" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S04-T03" aria-label="Copier S04-T03" title="Copier l’identifiant">S04-T03</button></th><td>Vérifier les accès autorisés et interdits</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S05" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S05-T01" aria-label="Copier S05-T01" title="Copier l’identifiant">S05-T01</button></th><td>Réaliser la création et la consultation des tickets</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S05" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S05-T02" aria-label="Copier S05-T02" title="Copier l’identifiant">S05-T02</button></th><td>Réaliser la réponse et la clôture</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S05" data-priority="Normale" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S05-T03" aria-label="Copier S05-T03" title="Copier l’identifiant">S05-T03</button></th><td>Intégrer les options métier retenues</td><td>Normale</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S06" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S06-T01" aria-label="Copier S06-T01" title="Copier l’identifiant">S06-T01</button></th><td>Intégrer la classification et la priorité</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S06" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S06-T02" aria-label="Copier S06-T02" title="Copier l’identifiant">S06-T02</button></th><td>Générer des brouillons à valider</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S06" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S06-T03" aria-label="Copier S06-T03" title="Copier l’identifiant">S06-T03</button></th><td>Vérifier l’indisponibilité, les quotas et le filtrage des données</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S07" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S07-T01" aria-label="Copier S07-T01" title="Copier l’identifiant">S07-T01</button></th><td>Concevoir les maquettes client et technicien</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S07" data-priority="Normale" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S07-T02" aria-label="Copier S07-T02" title="Copier l’identifiant">S07-T02</button></th><td>Vérifier les parcours, la lisibilité et l’accessibilité</td><td>Normale</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S08" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S08-T01" aria-label="Copier S08-T01" title="Copier l’identifiant">S08-T01</button></th><td>Construire les écrans client</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S08" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S08-T02" aria-label="Copier S08-T02" title="Copier l’identifiant">S08-T02</button></th><td>Construire les écrans technicien</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S08" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S08-T03" aria-label="Copier S08-T03" title="Copier l’identifiant">S08-T03</button></th><td>Intégrer les requêtes, mutations et états réseau</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S09" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S09-T01" aria-label="Copier S09-T01" title="Copier l’identifiant">S09-T01</button></th><td>Exécuter et documenter les tests fonctionnels</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S09" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S09-T02" aria-label="Copier S09-T02" title="Copier l’identifiant">S09-T02</button></th><td>Vérifier les autorisations, les injections et les secrets</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S09" data-priority="Basse" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S09-T03" aria-label="Copier S09-T03" title="Copier l’identifiant">S09-T03</button></th><td>Évaluer la protection renforcée contre les injections de prompt</td><td>Basse</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S10" data-priority="Haute" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S10-T01" aria-label="Copier S10-T01" title="Copier l’identifiant">S10-T01</button></th><td>Préparer le déploiement et les variables d’environnement</td><td>Haute</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+<tr data-sprint="S10" data-priority="Normale" data-status="TODO" data-issue-url=""><th scope="row"><button class="copy-id" type="button" data-copy="S10-T02" aria-label="Copier S10-T02" title="Copier l’identifiant">S10-T02</button></th><td>Finaliser le dossier, les guides et la démonstration</td><td>Normale</td><td><span class="badge badge-neutral">TODO</span></td><td>—</td><td class="issue-link">—</td></tr>
+  </tbody></table>
+</div>
+<p id="no-tasks" class="callout" hidden>Aucune tâche ne correspond aux filtres.</p>
+</section>
+<section class="chapter" id="decisions" aria-labelledby="h-decisions">
+<h2 id="h-decisions">Décisions de conception</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Journal des décisions"><table><caption>Journal des décisions</caption><thead><tr><th scope="col">ID</th><th scope="col">État</th><th scope="col">Décision</th><th scope="col">Détail</th></tr></thead><tbody>
+<tr><td><code>DEC-001</code></td><td><span class="badge badge-ok">Validée</span></td><td>Deux rôles et une seule entité UTILISATEUR</td><td>CLIENT et TECHNICIAN sont les deux seuls rôles. L’IA intervient en tant que service.</td></tr>
+<tr><td><code>DEC-002</code></td><td><span class="badge badge-ok">Validée</span></td><td>Cardinalités corrigées et catégorie dédiée</td><td>Les cardinalités acceptées figurent au MCD. Le ticket peut exister sans technicien, catégorie ou priorité selon les règles décrites.</td></tr>
+<tr><td><code>DEC-003</code></td><td><span class="badge badge-ok">Validée par l’étudiant</span></td><td>Stack principale</td><td>React, TanStack Query, Node.js, Fastify, REST, MVC adaptée aux API, PostgreSQL, Zod, JWT, RBAC à deux rôles, hachage et requêtes SQL paramétrées. Git, GitHub et Postman pour l’outillage. Express et Docker exclus. Accord du professeur sur Fastify à confirmer.</td></tr>
+<tr><td><code>DEC-004</code></td><td><span class="badge badge-ok">Validée</span></td><td>Contrôle humain de l’envoi</td><td>Le technicien modifie et valide le texte avant l’envoi. Seul le backend accède au LLM.</td></tr>
+<tr><td><code>DEC-005</code></td><td><span class="badge badge-warn">À confirmer</span></td><td>Navigation, cycle de vie et politique métier</td><td>Routes, transitions précises, réouverture, réponse après clôture, création des comptes et des produits, attribution et réaffectation.</td></tr>
+<tr><td><code>DEC-006</code></td><td><span class="badge badge-warn">À confirmer</span></td><td>Options fonctionnelles et données</td><td>Historique et échange de messages, recherche avancée, statistiques, base JSON/Markdown et nom_entreprise facultatif.</td></tr>
+<tr><td><code>DEC-007</code></td><td><span class="badge badge-warn">À confirmer</span></td><td>Choix d’implémentation</td><td>JavaScript ou TypeScript, bibliothèque de routage, CSS, fournisseur LLM, stockage et renouvellement JWT, driver SQL ou ORM, hébergement et acceptation de Fastify par le professeur.</td></tr>
+<tr><td><code>DEC-008</code></td><td><span class="badge badge-proposal">Proposition</span></td><td>Contrat REST et MLD</td><td>Les endpoints et le MLD servent de base de travail aux sprints S02 et S03. Le MPD et le SQL relèvent du sprint S02.</td></tr>
+</tbody></table></div>
+</section>
+<section class="chapter" id="methode" aria-labelledby="h-methode">
+<h2 id="h-methode">Méthode pédagogique</h2>
+
+<p>L’étudiant réalise les tâches en priorité. ChatGPT intervient comme chef de projet, mentor et Code Reviewer. Une implémentation complète par l’IA requiert la demande explicite de l’étudiant.</p>
+<ol class="workflow">
+  <li>Attribuer une tâche.</li><li>Expliquer les objectifs.</li><li>Réaliser la tâche en autonomie.</li><li>Soumettre le travail.</li><li>Effectuer la Code Review.</li><li>Apporter les corrections.</li><li>Exécuter les tests.</li><li>Valider le travail.</li><li>Passer à la tâche suivante.</li>
+</ol>
+</section>
+    <footer><span>SmartSupport · TechSolutions France</span><a href="#apercu">Retour à la vue d’ensemble ↑</a></footer>
+  </main>
+</div>
+<div id="feedback" class="toast" role="status"></div>
+</body>
+</html>
